@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.1'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.6.1'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     developmentOnly 'org.springframework.boot:spring-boot-devtools:2.6.1'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
