@@ -7,3 +7,5 @@ spring:
   data:
     rest:
       base-path: /api
+
+  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
