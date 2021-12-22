@@ -3,3 +3,7 @@ spring:
     url: jdbc:postgresql://localhost/landmarkist
     username: user
     password: password
+
+  data:
+    rest:
+      base-path: /api
