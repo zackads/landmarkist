@@ -2,7 +2,7 @@
 
 ## Test
 
-`./gradlew check` (doesn't yet run the smoke test)
+`./gradlew clean check`
 
 ## Deploy
 
