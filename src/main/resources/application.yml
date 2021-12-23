@@ -3,5 +3,5 @@ spring:
     url: jdbc:postgresql://localhost/landmarkist
     username: user
     password: password
-
-  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+  jpa:
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect

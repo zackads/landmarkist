@@ -4,7 +4,7 @@ services:
   # Database container for running a local development environment
   # Not used in tests or CI/CD; those needs are catered for by Testcontainers in AcceptanceTests.java
   db:
-    image: postgres:13.4-alpine
+    image: postgis/postgis:13-3.1-alpine
     ports:
       - 5432:5432
     environment:
