@@ -51,6 +51,14 @@ public class ListedBuildingControllerUnitTests {
     }
 
     @Test
+    public void sendsRequestErrorWhenPolygonIsInvalid() throws Exception {
+        String unclosedPolygon = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422";
+
+        this.mockMvc.perform(
+                get("/api/listedBuildings/search/findAllInPolygon?polygon=" + unclosedPolygon)).andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void givenAStringOfPointsReturnsAPolygon() {
         String query = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422,39.961879,-76.730422,39.961879,-76.730422,40.078811,-76.730422";
         Coordinate[] coordinates = new Coordinate[]{
