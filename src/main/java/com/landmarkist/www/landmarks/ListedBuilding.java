@@ -1,5 +1,6 @@
 package com.landmarkist.www.landmarks;
 
+import java.net.URL;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
 
 @Entity
@@ -23,13 +23,23 @@ public class ListedBuilding {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
     private String name;
+
+    /**
+     *  The entry number of the building on the statutory list.
+     */
+    private String listEntry;
 
     @Enumerated
     private Grade grade;
 
+    private String location;
+
     @Column(columnDefinition = "geography")
-    private Point location;
+    private Point geometry;
+
+    private URL hyperlink;
 
     enum Grade {
         ONE, TWO_STAR, TWO
