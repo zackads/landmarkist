@@ -2,6 +2,8 @@ package com.landmarkist.www.landmarks;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import net.bytebuddy.pool.TypePool;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
+@Validated
 @RequestMapping("/api")
 public class ListedBuildingController {
     ListedBuildingRepository repository;
@@ -30,8 +34,12 @@ public class ListedBuildingController {
 
     @GetMapping(value = "listedBuildings/search/findAllInPolygon")
     @ResponseBody
-    public List<ListedBuilding> findListedBuildingsInPolygon(@RequestParam("polygon") String polygon, @RequestParam(value = "size", defaultValue = "100") int size) {
+    public List<ListedBuilding> findListedBuildingsInPolygon(
+            @RequestParam("polygon") String polygon,
+            @RequestParam("size") Integer size) {
+
         System.out.println("Looking for buildings in polygon " + polygon);
+        System.out.println("Size = " + size);
 
         try {
             return repository.findAllInPolygon(createPolygonFromQueryString(polygon));

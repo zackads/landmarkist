@@ -42,10 +42,10 @@ public class ListedBuildingControllerUnitTests {
                         .findAllInPolygon(any(Polygon.class)))
                 .thenReturn(List.of(ListedBuilding.builder().name("Testington Towers").build()));
 
-        String polygonQuery = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422,39.961879,-76.730422,39.961879,-76.730422,40.078811,-76.730422";
+        String validPolygon = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422,39.961879,-76.730422,39.961879,-76.730422,40.078811,-76.730422";
 
         this.mockMvc.perform(
-                        get("/api/listedBuildings/search/findAllInPolygon?polygon=" + polygonQuery)).andExpect(status().isOk());
+                        get("/api/listedBuildings/search/findAllInPolygon?polygon=" + validPolygon)).andExpect(status().isOk());
 
         verify(mockRepository).findAllInPolygon(any(Polygon.class));
     }
