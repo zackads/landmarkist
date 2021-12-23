@@ -39,15 +39,15 @@ public class ListedBuildingControllerUnitTests {
     @Test
     public void canSearchByPolygon() throws Exception {
         Mockito.when(mockRepository
-                        .findAllInPolygon(any(Polygon.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(ListedBuilding.builder().name("Testington Towers").build())));
+                        .findAllInPolygon(any(Polygon.class)))
+                .thenReturn(List.of(ListedBuilding.builder().name("Testington Towers").build()));
 
         String polygonQuery = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422,39.961879,-76.730422,39.961879,-76.730422,40.078811,-76.730422";
 
         this.mockMvc.perform(
-                        get("/listedBuildings/search/findAllInPolygon?polygon=" + polygonQuery)).andExpect(status().isOk());
+                        get("/api/listedBuildings/search/findAllInPolygon?polygon=" + polygonQuery)).andExpect(status().isOk());
 
-        //verify(mockRepository).findAllInPolygon(any(Polygon.class), any(Pageable.class));
+        verify(mockRepository).findAllInPolygon(any(Polygon.class));
     }
 
     @Test

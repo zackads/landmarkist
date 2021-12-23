@@ -6,6 +6,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +27,10 @@ public class ListedBuildingController {
 
     @GetMapping(value = "listedBuildings/search/findAllInPolygon")
     @ResponseBody
-    public ResponseEntity<?> findListedBuildingsInPolygon(@RequestParam(name = "polygon") String polygon) {
-        Iterable<ListedBuilding> listedBuildings = repository.findAll();
+    public List<ListedBuilding> findListedBuildingsInPolygon(@RequestParam("polygon") String polygon, @RequestParam(value = "size", defaultValue = "100") int size) {
         System.out.println("Looking for buildings in polygon " + polygon);
 
-        return ResponseEntity.ok(listedBuildings);
+        return repository.findAllInPolygon(createPolygonFromQueryString(polygon));
     }
 
     public static Polygon createPolygonFromQueryString(String query) {
