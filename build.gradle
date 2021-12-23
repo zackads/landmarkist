@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.6.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "org.flywaydb.flyway" version "8.3.0"
     id 'java'
 }
 
@@ -14,7 +15,20 @@ configurations {
     }
 }
 
+flyway {
+    url = 'jdbc:postgresql://localhost/landmarkist'
+    user = 'user'
+    password = 'password'
+    locations = ['classpath:db/migration']
+}
+
+// Build Java migration classes before migrating
+flywayMigrate.dependsOn classes
+
 repositories {
+    maven {
+        url "https://repo.osgeo.org/repository/release/"
+    }
     mavenCentral()
 }
 
@@ -45,6 +59,8 @@ dependencies {
     implementation 'net.postgis:postgis-jdbc:2021.1.0'
     implementation 'com.bedatadriven:jackson-datatype-jts:2.4'
     implementation 'org.locationtech.jts:jts-core:1.18.2'
+    implementation 'org.geotools:gt-main:26.1'
+    implementation 'org.geotools:gt-shapefile:26.1'
 
     // Dev + test
     developmentOnly 'org.springframework.boot:spring-boot-devtools:2.6.1'
