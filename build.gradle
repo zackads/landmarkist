@@ -61,6 +61,8 @@ dependencies {
     implementation 'org.locationtech.jts:jts-core:1.18.2'
     implementation 'org.geotools:gt-main:26.1'
     implementation 'org.geotools:gt-shapefile:26.1'
+    implementation 'org.geotools:gt-epsg-hsql:26.1'
+
 
     // Dev + test
     developmentOnly 'org.springframework.boot:spring-boot-devtools:2.6.1'
