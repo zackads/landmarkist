@@ -1,5 +1,6 @@
 package com.landmarkist.www.landmarks;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URL;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -33,6 +34,7 @@ public class ListedBuilding {
 
     @NotNull
     @Column(columnDefinition = "geography")
+    @JsonSerialize(using = PointSerializer.class)
     private Point location;
 
     @NotEmpty
