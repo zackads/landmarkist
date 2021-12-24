@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.util.Map;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
@@ -14,20 +15,21 @@ import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.springframework.context.annotation.Profile;
 
 public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
     public void migrate(Context context) throws SQLException, IOException {
         try (PreparedStatement statement = context.getConnection()
                 .prepareStatement("INSERT INTO listed_building " +
-                        "(name, grade, location, geometry, list_entry, hyperlink) VALUES " +
-                        "(?, ?, ?, POINT(?, ?), ?, ?)")) {
+                        "(name, grade, location_name, location, list_entry, hyperlink) VALUES " +
+                        "(?, ?, ?, ST_Point(?, ?), ?, ?)")) {
 
             try (FeatureIterator<SimpleFeature> features = getFeaturesFromShapefile("src/main/resources/data/listed_buildings/england/ListedBuildings_16Dec2021.shp")) {
-                while (features.hasNext()) {
+                for (int i = 0; i < 100 && features.hasNext(); i++) {
                     SimpleFeature feature = features.next();
 
                     statement.setString(1, feature.getAttribute("Name").toString());
-                    statement.setInt(2, toListedBuildingGradeInteger(feature.getAttribute("Grade").toString()));
+                    statement.setString(2, feature.getAttribute("Grade").toString());
                     statement.setString(3, feature.getAttribute("Location").toString());
                     statement.setFloat(4, Float.parseFloat(feature.getAttribute("Easting").toString()));
                     statement.setFloat(5, Float.parseFloat(feature.getAttribute("Northing").toString()));
@@ -45,10 +47,5 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
         FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(dataStore.getTypeNames()[0]);
 
         return source.getFeatures(Filter.INCLUDE).features();
-    }
-
-    private Integer toListedBuildingGradeInteger(String grade) {
-        Map<String, Integer> listedBuildingGrades = Map.of("I", 1, "II*", 2, "II", 3);
-        return listedBuildingGrades.get(grade);
     }
 }

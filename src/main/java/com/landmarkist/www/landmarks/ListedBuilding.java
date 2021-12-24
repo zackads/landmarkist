@@ -4,10 +4,11 @@ import java.net.URL;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,24 +25,25 @@ public class ListedBuilding {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NotEmpty
     private String name;
+
+    @NotEmpty
+    private String grade;
+
+    @NotNull
+    @Column(columnDefinition = "geography")
+    private Point location;
+
+    @NotEmpty
+    private String locationName;
 
     /**
      *  The entry number of the building on the statutory list.
      */
+    @NotEmpty
     private String listEntry;
 
-    @Enumerated
-    private Grade grade;
-
-    private String location;
-
-    @Column(columnDefinition = "geography")
-    private Point geometry;
-
+    @NotEmpty
     private URL hyperlink;
-
-    enum Grade {
-        ONE, TWO_STAR, TWO
-    }
 }
