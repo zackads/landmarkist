@@ -34,7 +34,6 @@ public class ListedBuilding {
 
     @NotNull
     @Column(columnDefinition = "geography")
-    @JsonSerialize(using = PointSerializer.class)
     private Point location;
 
     @NotEmpty

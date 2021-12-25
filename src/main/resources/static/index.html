@@ -103,7 +103,6 @@
                 bounds.getNorthWest().toArray().toString(),
                 bounds.getNorthEast().toArray().toString(),
             ].join(",");
-            console.log("Moved! Viewport: " + viewport);
 
             map.getSource('listedBuildings').setData(`http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport}`);
         })
