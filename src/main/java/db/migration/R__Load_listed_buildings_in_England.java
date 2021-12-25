@@ -34,14 +34,10 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
                         "(?, ?, ?, ST_Point(?, ?), ?, ?)")) {
 
             try (FeatureIterator<SimpleFeature> features = getFeaturesFromShapefile("src/main/resources/data/listed_buildings/england/ListedBuildings_16Dec2021.shp")) {
-                for (int i = 0; i < 100 && features.hasNext(); i++) {
+                for (int i = 0; i < 10000 && features.hasNext(); i++) {
                     SimpleFeature feature = features.next();
 
                     Coordinate location = convertBNGtoWGS84(createBNGCoordinate(feature.getAttribute("Easting").toString(), feature.getAttribute("Northing").toString()));
-                    System.out.println("=====");
-                    System.out.println("Easting: " + feature.getAttribute("Easting"));
-                    System.out.println("Northing: " + feature.getAttribute("Northing"));
-                    System.out.println(Arrays.toString(new Double[] {location.x, location.y}));
 
                     statement.setString(1, feature.getAttribute("Name").toString());
                     statement.setString(2, feature.getAttribute("Grade").toString());
