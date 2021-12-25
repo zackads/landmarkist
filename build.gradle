@@ -62,6 +62,7 @@ dependencies {
     implementation 'org.geotools:gt-main:26.1'
     implementation 'org.geotools:gt-shapefile:26.1'
     implementation 'org.geotools:gt-epsg-hsql:26.1'
+    implementation 'org.wololo:jts2geojson:0.16.1'
 
 
     // Dev + test
