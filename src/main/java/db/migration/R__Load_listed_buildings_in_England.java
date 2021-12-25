@@ -4,23 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Map;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.geometry.primitive.Point;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -37,7 +34,10 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
                 for (int i = 0; i < 10000 && features.hasNext(); i++) {
                     SimpleFeature feature = features.next();
 
-                    Coordinate location = convertBNGtoWGS84(createBNGCoordinate(feature.getAttribute("Easting").toString(), feature.getAttribute("Northing").toString()));
+                    double easting = Double.parseDouble(feature.getAttribute("Easting").toString());
+                    double northing = Double.parseDouble(feature.getAttribute("Northing").toString());
+
+                    Coordinate location = convertBNGtoWGS84(new Coordinate(easting, northing));
 
                     statement.setString(1, feature.getAttribute("Name").toString());
                     statement.setString(2, feature.getAttribute("Grade").toString());
@@ -67,13 +67,8 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
      */
     private Coordinate convertBNGtoWGS84(Coordinate bngPoint) throws FactoryException, TransformException {
         CoordinateReferenceSystem britishNationalGrid = CRS.decode("EPSG:27700");
-        CoordinateReferenceSystem wgs84 = CRS.decode("EPSG:4326");
 
-        MathTransform transform = CRS.findMathTransform(britishNationalGrid, wgs84);
+        MathTransform transform = CRS.findMathTransform(britishNationalGrid, DefaultGeographicCRS.WGS84);
         return JTS.transform(bngPoint, null, transform);
-    }
-
-    private Coordinate createBNGCoordinate(String easting, String northing) {
-        return new Coordinate(Double.parseDouble(easting), Double.parseDouble(northing));
     }
 }
