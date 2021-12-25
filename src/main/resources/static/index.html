@@ -5,44 +5,70 @@
     <title>Display a map on a webpage</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <style>
         body { margin: 0; padding: 0; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .alert-fixed {
+            position:fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index:9999;
+            border-radius:10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 <h1>Landmarkist</h1>
+<div id="message" class="alert alert-warning alert-fixed" role="alert">Message text</div>
 <div id="map"></div>
 <script>
+    const viewport = () => {
+        const bounds = map.getBounds();
+
+        return [
+            bounds.getNorthEast().toArray().toString(),
+            bounds.getSouthEast().toArray().toString(),
+            bounds.getSouthWest().toArray().toString(),
+            bounds.getNorthWest().toArray().toString(),
+            bounds.getNorthEast().toArray().toString(),
+        ].join(",");
+    }
+
+    const showMessage = (text) => {
+        document.getElementById("message").innerHTML = text;
+        document.getElementById("message").style.display = "block";
+    }
+
+    const hideMessage = () => {
+        document.getElementById("message").style.display = "none";
+    }
+
+    let abortController = null;
+
     mapboxgl.accessToken = 'pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw';
     const map = new mapboxgl.Map({
         container: 'map', // container ID
         style: 'mapbox://styles/mapbox/light-v10', // style URL
         center: [-2.59, 51.45], // starting position [lng, lat]
-        zoom: 1 // starting zoom
+        zoom: 10 // starting zoom
     });
 
     map.on('load', () => {
-        const bounds = map.getBounds();
-
-        const viewport = [
-            bounds.getNorthEast().toArray().reverse().toString(),
-            bounds.getSouthEast().toArray().reverse().toString(),
-            bounds.getSouthWest().toArray().reverse().toString(),
-            bounds.getNorthWest().toArray().reverse().toString(),
-            bounds.getNorthEast().toArray().reverse().toString(),
-        ].join(",");
-
         map.addSource('listedBuildings', {
             type: 'geojson',
-            data: `http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport}`,
+            data: `http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(map)}`,
             cluster: true,
             clusterMaxZoom: 14,
         });
 
         map.addLayer({
             id: 'clusters',
+            minzoom: 10,
             type: 'circle',
             source: 'listedBuildings',
             filter: ['has', 'point_count'],
@@ -70,6 +96,7 @@
 
         map.addLayer({
             id: 'cluster-count',
+            minzoom: 10,
             type: 'symbol',
             source: 'listedBuildings',
             filter: ['has', 'point_count'],
@@ -82,6 +109,7 @@
 
         map.addLayer({
             id: 'unclustered-point',
+            minzoom: 10,
             type: 'circle',
             source: 'listedBuildings',
             filter: ['!', ['has', 'point_count']],
@@ -94,17 +122,21 @@
         });
 
         map.on('moveend', () => {
-            const bounds = map.getBounds();
+            if (map.getZoom() < 10) {
+                showMessage("Uh-oh! Too many buildings.  Try zooming in.");
+            } else {
+                hideMessage();
+            }
+        })
 
-            const viewport = [
-                bounds.getNorthEast().toArray().toString(),
-                bounds.getSouthEast().toArray().toString(),
-                bounds.getSouthWest().toArray().toString(),
-                bounds.getNorthWest().toArray().toString(),
-                bounds.getNorthEast().toArray().toString(),
-            ].join(",");
+        map.on('moveend', () => {
+            if (map.getZoom() < 10) {
+                if (abortController) abortController.abort();
+                if (mapMessage) mapMessage.remove();
+                abortController = new AbortController();
 
-            map.getSource('listedBuildings').setData(`http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport}`);
+                map.getSource('listedBuildings').setData(`http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(map)}`);
+            }
         })
     });
 </script>
