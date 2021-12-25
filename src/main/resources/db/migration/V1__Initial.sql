@@ -12,3 +12,5 @@ CREATE TABLE listed_building
     hyperlink       VARCHAR(255) NOT NULL UNIQUE,
     list_entry      VARCHAR(255) UNIQUE NOT NULL UNIQUE
 );
+
+CREATE INDEX listed_building_location ON listed_building USING GIST (location);
