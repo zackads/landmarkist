@@ -31,7 +31,7 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
                         "(?, ?, ?, ST_Point(?, ?), ?, ?)")) {
 
             try (FeatureIterator<SimpleFeature> features = getFeaturesFromShapefile("src/main/resources/data/listed_buildings/england/ListedBuildings_16Dec2021.shp")) {
-                for (int i = 0; i < 10000 && features.hasNext(); i++) {
+                while (features.hasNext()) {
                     SimpleFeature feature = features.next();
 
                     double easting = Double.parseDouble(feature.getAttribute("Easting").toString());
@@ -46,9 +46,9 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
                     statement.setDouble(5, location.y);
                     statement.setString(6, feature.getAttribute("ListEntry").toString());
                     statement.setString(7, feature.getAttribute("Hyperlink").toString());
-
-                    statement.execute();
+                    statement.addBatch();
                 }
+                statement.executeBatch();
             }
         }
     }
@@ -56,6 +56,7 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
     private FeatureIterator<SimpleFeature> getFeaturesFromShapefile(String pathname) throws IOException {
         DataStore dataStore = DataStoreFinder.getDataStore(Map.of("url", new File(pathname).toURI().toURL()));
         FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(dataStore.getTypeNames()[0]);
+        dataStore.dispose();
 
         return source.getFeatures(Filter.INCLUDE).features();
     }
