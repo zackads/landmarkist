@@ -37,7 +37,6 @@ public class ListedBuildingController {
     @ResponseBody
     public ResponseEntity<FeatureCollection> findListedBuildingsInPolygon2(
             @RequestParam("polygon") String polygon) {
-        System.out.println("Received request at: " + System.currentTimeMillis());
         try {
             List<ListedBuilding> listedBuildings = repository.findAllInPolygon(createPolygonFromQueryString(polygon));
 
@@ -50,7 +49,6 @@ public class ListedBuildingController {
 
 
     public static Polygon createPolygonFromQueryString(String query) {
-        System.out.println("Started creating Polygon from QS at: " + System.currentTimeMillis());
         String[] array = query.split(",");
 
         List<Coordinate> coordinates = new ArrayList<>();
@@ -58,7 +56,6 @@ public class ListedBuildingController {
             coordinates.add(new Coordinate(Double.parseDouble(array[i]), Double.parseDouble(array[i + 1])));
         }
 
-        System.out.println("Finished creating Polygon from QS at: " + System.currentTimeMillis());
         return new GeometryFactory().createPolygon(coordinates.toArray(new Coordinate[]{}));
     }
 
