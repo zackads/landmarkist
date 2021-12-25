@@ -37,19 +37,11 @@ public class ListedBuildingController {
     @ResponseBody
     public ResponseEntity<FeatureCollection> findListedBuildingsInPolygon2(
             @RequestParam("polygon") String polygon) {
+        System.out.println("Received request at: " + System.currentTimeMillis());
         try {
             List<ListedBuilding> listedBuildings = repository.findAllInPolygon(createPolygonFromQueryString(polygon));
 
-            GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
-
-            Feature[] features = listedBuildings.stream().map(listedBuilding -> {
-                Map<String, Object> properties = new HashMap<>();
-                Geometry geo = listedBuilding.getLocation();
-
-                return new Feature(geoJSONWriter.write(geo), properties);
-            }).toArray(Feature[]::new);
-
-            return new ResponseEntity<>(new FeatureCollection(features), HttpStatus.OK);
+            return new ResponseEntity<>(createFeatureCollection(listedBuildings), HttpStatus.OK);
 
         } catch(IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem with the polygon.  Try again.");
@@ -58,6 +50,7 @@ public class ListedBuildingController {
 
 
     public static Polygon createPolygonFromQueryString(String query) {
+        System.out.println("Started creating Polygon from QS at: " + System.currentTimeMillis());
         String[] array = query.split(",");
 
         List<Coordinate> coordinates = new ArrayList<>();
@@ -65,6 +58,20 @@ public class ListedBuildingController {
             coordinates.add(new Coordinate(Double.parseDouble(array[i]), Double.parseDouble(array[i + 1])));
         }
 
+        System.out.println("Finished creating Polygon from QS at: " + System.currentTimeMillis());
         return new GeometryFactory().createPolygon(coordinates.toArray(new Coordinate[]{}));
+    }
+
+    private FeatureCollection createFeatureCollection(List<ListedBuilding> listedBuildings) {
+        GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+
+        Feature[] features = listedBuildings.stream().map(listedBuilding -> {
+            Map<String, Object> properties = new HashMap<>();
+            Geometry geo = listedBuilding.getLocation();
+
+            return new Feature(geoJSONWriter.write(geo), properties);
+        }).toArray(Feature[]::new);
+
+        return new FeatureCollection(features);
     }
 }
