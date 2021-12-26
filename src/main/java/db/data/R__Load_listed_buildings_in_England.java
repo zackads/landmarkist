@@ -1,4 +1,4 @@
-package db.migration;
+package db.data;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
     ) {
       try (
         FeatureIterator<SimpleFeature> features = getFeaturesFromShapefile(
-          "src/main/resources/data/listed_buildings/england/ListedBuildings_16Dec2021.shp"
+          "src/main/java/db/data/ListedBuildings_16Dec2021.shp"
         )
       ) {
         while (features.hasNext()) {

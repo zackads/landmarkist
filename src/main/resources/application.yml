@@ -5,3 +5,5 @@ spring:
     password: password
   jpa:
     database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+  flyway:
+    locations: classpath:/db/migration,classpath:/db/data
