@@ -23,6 +23,9 @@ const map = new mapboxgl.Map({
   minZoom: 10
 });
 
+map.addControl(new mapboxgl.NavigationControl());
+
+
 map.on("load", () => {
   map.addSource("listedBuildings", {
     type: "geojson",
