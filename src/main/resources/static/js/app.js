@@ -79,17 +79,17 @@ map.on("load", () => {
       "circle-stroke-color": "#fff",
     },
   });
+});
 
-  map.on("moveend", () => {
-    if (abortController) abortController.abort();
-    abortController = new AbortController();
+map.on("moveend", () => {
+  if (abortController) abortController.abort();
+  abortController = new AbortController();
 
-    map
+  map
       .getSource("listedBuildings")
       .setData(
-        `http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(
-          map
-        )}`
+          `http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(
+              map
+          )}`
       );
-  });
 });
