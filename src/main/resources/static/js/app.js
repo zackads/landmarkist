@@ -15,15 +15,38 @@ let abortController = null;
 mapboxgl.accessToken =
   "pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw";
 
+const startingCenter = "-2.59,51.45";
+
+const getQueryCenter = () => {
+    const center = new URLSearchParams(window.location.search)
+        .get("center") || startingCenter;
+
+    return center
+        .split(",")
+        .map(parseFloat);
+}
+
+const setQueryCenter = (lnglat) => {
+  const url = new URL(window.location);
+  url.searchParams.set('center', lnglat.toArray());
+  window.history.pushState({}, '', url);
+}
+
 const map = new mapboxgl.Map({
   container: "map", // ID of the DOM element to contain the map
   style: "mapbox://styles/mapbox/light-v10",
-  center: [-2.59, 51.45],
+  center: getQueryCenter(),
   zoom: 10,
   minZoom: 10
 });
 
 map.addControl(new mapboxgl.NavigationControl());
+
+
+// Update URL query params to reflect current center
+map.on("moveend", () => {
+  setQueryCenter(map.getCenter())
+})
 
 
 map.on("load", () => {
