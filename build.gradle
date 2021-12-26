@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.6.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "io.freefair.lombok" version "6.3.0"
     id "org.flywaydb.flyway" version "8.3.0"
     id 'java'
 }
@@ -37,7 +38,7 @@ ext {
 }
 
 dependencies {
-    // Web
+    // Backend
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:2.6.1'
@@ -46,8 +47,6 @@ dependencies {
 
     // Domain
     implementation 'org.hibernate.validator:hibernate-validator:7.0.2.Final'
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.1'
@@ -71,9 +70,7 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:1.16.2"
     testImplementation 'org.testcontainers:testcontainers:1.16.2'
     testImplementation 'org.testcontainers:junit-jupiter:1.16.2'
-    testImplementation 'org.testcontainers:selenium:1.16.2'
-    // selenium-chrome-driver must remain at version 3.141.59 to work with Testcontainers
-    testImplementation 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
+    testImplementation 'io.github.wimdeblauwe:testcontainers-cypress:1.6.1'
 }
 
 dependencyManagement {
@@ -84,4 +81,11 @@ dependencyManagement {
 
 test {
     useJUnitPlatform()
+}
+
+processTestResources {
+    from("src/test/e2e") {
+        exclude 'node_modules'
+        into("e2e")
+    }
 }
