@@ -1,144 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Display a map on a webpage</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
     <style>
-        body { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-        .alert-fixed {
-            position:fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index:9999;
-            border-radius:10px;
-            display: none;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .alert-fixed {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        border-radius: 10px;
+        display: none;
+      }
     </style>
-</head>
-<body>
-<h1>Landmarkist</h1>
-<div id="message" class="alert alert-warning alert-fixed" role="alert">Message text</div>
-<div id="map"></div>
-<script>
-    const viewport = () => {
-        const bounds = map.getBounds();
-
-        return [
-            bounds.getNorthEast().toArray().toString(),
-            bounds.getSouthEast().toArray().toString(),
-            bounds.getSouthWest().toArray().toString(),
-            bounds.getNorthWest().toArray().toString(),
-            bounds.getNorthEast().toArray().toString(),
-        ].join(",");
-    }
-
-    const showMessage = (text) => {
-        document.getElementById("message").innerHTML = text;
-        document.getElementById("message").style.display = "block";
-    }
-
-    const hideMessage = () => {
-        document.getElementById("message").style.display = "none";
-    }
-
-    let abortController = null;
-
-    mapboxgl.accessToken = 'pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw';
-    const map = new mapboxgl.Map({
-        container: 'map', // container ID
-        style: 'mapbox://styles/mapbox/light-v10', // style URL
-        center: [-2.59, 51.45], // starting position [lng, lat]
-        zoom: 10 // starting zoom
-    });
-
-    map.on('load', () => {
-        map.addSource('listedBuildings', {
-            type: 'geojson',
-            data: `http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(map)}`,
-            cluster: true,
-            clusterMaxZoom: 14,
-        });
-
-        map.addLayer({
-            id: 'clusters',
-            minzoom: 10,
-            type: 'circle',
-            source: 'listedBuildings',
-            filter: ['has', 'point_count'],
-            paint: {
-                'circle-color': [
-                    'step',
-                    ['get', 'point_count'],
-                    '#51bbd6',
-                    100,
-                    '#f1f075',
-                    750,
-                    '#f28cb1'
-                ],
-                'circle-radius': [
-                    'step',
-                    ['get', 'point_count'],
-                    20,
-                    100,
-                    30,
-                    750,
-                    40
-                ]
-            }
-        });
-
-        map.addLayer({
-            id: 'cluster-count',
-            minzoom: 10,
-            type: 'symbol',
-            source: 'listedBuildings',
-            filter: ['has', 'point_count'],
-            layout: {
-                'text-field': '{point_count_abbreviated}',
-                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-                'text-size': 12
-            }
-        });
-
-        map.addLayer({
-            id: 'unclustered-point',
-            minzoom: 10,
-            type: 'circle',
-            source: 'listedBuildings',
-            filter: ['!', ['has', 'point_count']],
-            paint: {
-                'circle-color': '#11b4da',
-                'circle-radius': 4,
-                'circle-stroke-width': 1,
-                'circle-stroke-color': '#fff'
-            }
-        });
-
-        map.on('moveend', () => {
-            if (map.getZoom() < 10) {
-                showMessage("Uh-oh! Too many buildings.  Try zooming in.");
-            } else {
-                hideMessage();
-            }
-        })
-
-        map.on('moveend', () => {
-            if (map.getZoom() < 10) {
-                if (abortController) abortController.abort();
-                if (mapMessage) mapMessage.remove();
-                abortController = new AbortController();
-
-                map.getSource('listedBuildings').setData(`http://localhost:8080/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(map)}`);
-            }
-        })
-    });
-</script>
-</body>
+  </head>
+  <body>
+    <h1>Landmarkist</h1>
+    <div id="message" class="alert alert-warning alert-fixed" role="alert">
+      Message text
+    </div>
+    <div id="map"></div>
+    <script src="js/app.js"></script>
+  </body>
 </html>
