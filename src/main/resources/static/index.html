@@ -34,21 +34,24 @@
         bottom: 0;
         width: 100%;
       }
-      .alert-fixed {
+      .loading {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
         border-radius: 10px;
-        display: none;
+        visibility: hidden;
+      }
+      .loading.display {
+        visibility: visible;
       }
     </style>
   </head>
   <body>
     <h1>Landmarkist</h1>
-    <div id="message" class="alert alert-warning alert-fixed" role="alert">
-      Message text
+    <div id="messages">
+
     </div>
     <div id="map"></div>
     <script src="js/app.js"></script>
