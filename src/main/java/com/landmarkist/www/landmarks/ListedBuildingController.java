@@ -26,49 +26,68 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 @Validated
 @RequestMapping("/api")
 public class ListedBuildingController {
-    ListedBuildingRepository repository;
 
-    @Autowired
-    public ListedBuildingController(ListedBuildingRepository repository) {
-        this.repository = repository;
+  ListedBuildingRepository repository;
+
+  @Autowired
+  public ListedBuildingController(ListedBuildingRepository repository) {
+    this.repository = repository;
+  }
+
+  @GetMapping(value = "listedBuildings/search/findAllInPolygon")
+  @ResponseBody
+  public ResponseEntity<FeatureCollection> findListedBuildingsInPolygon2(
+    @RequestParam("polygon") String polygon
+  ) {
+    try {
+      List<ListedBuilding> listedBuildings = repository.findAllInPolygon(
+        createPolygonFromQueryString(polygon)
+      );
+
+      return new ResponseEntity<>(
+        createFeatureCollection(listedBuildings),
+        HttpStatus.OK
+      );
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "There was a problem with the polygon.  Try again."
+      );
+    }
+  }
+
+  public static Polygon createPolygonFromQueryString(String query) {
+    String[] array = query.split(",");
+
+    List<Coordinate> coordinates = new ArrayList<>();
+    for (int i = 0; i < array.length; i += 2) {
+      coordinates.add(
+        new Coordinate(
+          Double.parseDouble(array[i]),
+          Double.parseDouble(array[i + 1])
+        )
+      );
     }
 
-    @GetMapping(value = "listedBuildings/search/findAllInPolygon")
-    @ResponseBody
-    public ResponseEntity<FeatureCollection> findListedBuildingsInPolygon2(
-            @RequestParam("polygon") String polygon) {
-        try {
-            List<ListedBuilding> listedBuildings = repository.findAllInPolygon(createPolygonFromQueryString(polygon));
+    return new GeometryFactory()
+      .createPolygon(coordinates.toArray(new Coordinate[] {}));
+  }
 
-            return new ResponseEntity<>(createFeatureCollection(listedBuildings), HttpStatus.OK);
+  private FeatureCollection createFeatureCollection(
+    List<ListedBuilding> listedBuildings
+  ) {
+    GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
 
-        } catch(IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem with the polygon.  Try again.");
-        }
-    }
+    Feature[] features = listedBuildings
+      .stream()
+      .map(listedBuilding -> {
+        Map<String, Object> properties = new HashMap<>();
+        Geometry geo = listedBuilding.getLocation();
 
+        return new Feature(geoJSONWriter.write(geo), properties);
+      })
+      .toArray(Feature[]::new);
 
-    public static Polygon createPolygonFromQueryString(String query) {
-        String[] array = query.split(",");
-
-        List<Coordinate> coordinates = new ArrayList<>();
-        for (int i = 0; i < array.length; i += 2) {
-            coordinates.add(new Coordinate(Double.parseDouble(array[i]), Double.parseDouble(array[i + 1])));
-        }
-
-        return new GeometryFactory().createPolygon(coordinates.toArray(new Coordinate[]{}));
-    }
-
-    private FeatureCollection createFeatureCollection(List<ListedBuilding> listedBuildings) {
-        GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
-
-        Feature[] features = listedBuildings.stream().map(listedBuilding -> {
-            Map<String, Object> properties = new HashMap<>();
-            Geometry geo = listedBuilding.getLocation();
-
-            return new Feature(geoJSONWriter.write(geo), properties);
-        }).toArray(Feature[]::new);
-
-        return new FeatureCollection(features);
-    }
+    return new FeatureCollection(features);
+  }
 }

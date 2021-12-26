@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class LandmarkistApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(LandmarkistApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(LandmarkistApplication.class, args);
+  }
 }

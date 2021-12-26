@@ -16,33 +16,45 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public final class AcceptanceTests {
 
-    private static final BrowserWebDriverContainer<?> chrome = new BrowserWebDriverContainer<>()
-            .withCapabilities(new ChromeOptions());
+  private static final BrowserWebDriverContainer<?> chrome = new BrowserWebDriverContainer<>()
+    .withCapabilities(new ChromeOptions());
 
-    @LocalServerPort
-    private int port;
+  @LocalServerPort
+  private int port;
 
-    @BeforeAll
-    static void beforeAll(@Autowired Environment environment) {
-        org.testcontainers.Testcontainers.exposeHostPorts(environment.getProperty("local.server.port", Integer.class));
-        chrome.start();
-    }
+  @BeforeAll
+  static void beforeAll(@Autowired Environment environment) {
+    org.testcontainers.Testcontainers.exposeHostPorts(
+      environment.getProperty("local.server.port", Integer.class)
+    );
+    chrome.start();
+  }
 
-    @Test
-    public void indexPageLoads(@Autowired Environment env) {
-        RemoteWebDriver driver = chrome.getWebDriver();
-        String url = "http://host.testcontainers.internal" + ":" + port;
+  @Test
+  public void indexPageLoads(@Autowired Environment env) {
+    RemoteWebDriver driver = chrome.getWebDriver();
+    String url = "http://host.testcontainers.internal" + ":" + port;
 
-        driver.get(url);
-        assertEquals(1, driver.findElements(By.tagName("h1")).size(), "User can see a single page heading");
-    }
+    driver.get(url);
+    assertEquals(
+      1,
+      driver.findElements(By.tagName("h1")).size(),
+      "User can see a single page heading"
+    );
+  }
 
-    @Test
-    public void userCanSeeAListedBuildingMarker(@Autowired Environment env) {
-        RemoteWebDriver driver = chrome.getWebDriver();
-        String url = "http://host.testcontainers.internal" + ":" + port;
+  @Test
+  public void userCanSeeAListedBuildingMarker(@Autowired Environment env) {
+    RemoteWebDriver driver = chrome.getWebDriver();
+    String url = "http://host.testcontainers.internal" + ":" + port;
 
-        driver.get(url);
-        assertEquals(1, driver.findElements(By.cssSelector("div[aria-label='Listed building']")).size(), "User can see a listed building marker");
-    }
+    driver.get(url);
+    assertEquals(
+      1,
+      driver
+        .findElements(By.cssSelector("div[aria-label='Listed building']"))
+        .size(),
+      "User can see a listed building marker"
+    );
+  }
 }

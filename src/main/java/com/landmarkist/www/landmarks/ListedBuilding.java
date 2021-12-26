@@ -22,29 +22,30 @@ import org.locationtech.jts.geom.Point;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListedBuilding {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
 
-    @NotEmpty
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private UUID id;
 
-    @NotEmpty
-    private String grade;
+  @NotEmpty
+  private String name;
 
-    @NotNull
-    @Column(columnDefinition = "geography")
-    private Point location;
+  @NotEmpty
+  private String grade;
 
-    @NotEmpty
-    private String locationName;
+  @NotNull
+  @Column(columnDefinition = "geography")
+  private Point location;
 
-    /**
-     *  The entry number of the building on the statutory list.
-     */
-    @NotEmpty
-    private String listEntry;
+  @NotEmpty
+  private String locationName;
 
-    @NotEmpty
-    private URL hyperlink;
+  /**
+   *  The entry number of the building on the statutory list.
+   */
+  @NotEmpty
+  private String listEntry;
+
+  @NotEmpty
+  private URL hyperlink;
 }
