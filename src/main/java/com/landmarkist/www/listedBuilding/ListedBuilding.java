@@ -1,6 +1,5 @@
-package com.landmarkist.www.landmarks;
+package com.landmarkist.www.listedBuilding;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URL;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -23,29 +22,29 @@ import org.locationtech.jts.geom.Point;
 @AllArgsConstructor
 public class ListedBuilding {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-  @NotEmpty
-  private String name;
+    @NotEmpty
+    private String name;
 
-  @NotEmpty
-  private String grade;
+    @NotEmpty
+    private String grade;
 
-  @NotNull
-  @Column(columnDefinition = "geography")
-  private Point location;
+    @NotNull
+    @Column(columnDefinition = "geography")
+    private Point location;
 
-  @NotEmpty
-  private String locationName;
+    @NotEmpty
+    private String locationName;
 
-  /**
-   *  The entry number of the building on the statutory list.
-   */
-  @NotEmpty
-  private String listEntry;
+    /**
+     * The entry number of the building on the statutory list.
+     */
+    @NotEmpty
+    private String listEntry;
 
-  @NotEmpty
-  private URL hyperlink;
+    @NotEmpty
+    private URL hyperlink;
 }

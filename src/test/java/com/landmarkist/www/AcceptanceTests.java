@@ -1,7 +1,7 @@
 package com.landmarkist.www;
 
-import com.landmarkist.www.landmarks.ListedBuilding;
-import com.landmarkist.www.landmarks.ListedBuildingRepository;
+import com.landmarkist.www.listedBuilding.ListedBuilding;
+import com.landmarkist.www.listedBuilding.ListedBuildingRepository;
 import io.github.wimdeblauwe.testcontainers.cypress.CypressContainer;
 import io.github.wimdeblauwe.testcontainers.cypress.CypressTest;
 import io.github.wimdeblauwe.testcontainers.cypress.CypressTestResults;

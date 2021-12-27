@@ -41,6 +41,7 @@ dependencies {
     // Backend
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.1'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:2.6.1'
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.1'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.2'
