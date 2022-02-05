@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.net.URL;
@@ -33,10 +34,13 @@ public class ListedBuildingControllerUnitTests {
     @Test
     public void canSearchByPolygon() throws Exception {
         Mockito.when(mockRepository.findAllInPolygon(any(Polygon.class)))
-                .thenReturn(List.of(ListedBuilding.builder().name("Grade 1 Guardhouse").grade("I")
+                .thenReturn(List.of(ListedBuilding.builder()
+                        .name("Grade 1 Guardhouse")
+                        .grade("I")
                         .location(new GeometryFactory().createPoint(new Coordinate(0.25, 0.75)))
                         .locationName("Testershire").listEntry("1")
-                        .hyperlink(new URL("https://historicengland.org.uk/1")).build()));
+                        .hyperlink(new URL("https://historicengland.org.uk/1"))
+                        .build()));
 
         String validPolygon = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422,39.961879,-76.730422,39.961879,-76.730422,40.078811,-76.730422";
 
@@ -52,6 +56,38 @@ public class ListedBuildingControllerUnitTests {
 
         this.mockMvc.perform(get("/api/listedBuildings/search/findAllInPolygon?polygon=" + unclosedPolygon))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void whenAListedBuildingIsFound_thenIncludeInformationAboutTheListing() throws Exception {
+        ListedBuilding listedBuilding = ListedBuilding.builder()
+                .name("Grade 1 Guardhouse")
+                .grade("I")
+                .location(new GeometryFactory().createPoint(new Coordinate(0.25, 0.75)))
+                .locationName("Testershire")
+                .listEntry("42")
+                .hyperlink(new URL("https://historicengland.org.uk/42"))
+                .build();
+        Mockito.when(mockRepository.findAllInPolygon(any(Polygon.class)))
+                .thenReturn(List.of(listedBuilding));
+
+        String validPolygon = "40.078811,-76.730422,41.078811,-74.730422,40.078811,-74.730422,39.961879,-76.730422,39.961879,-76.730422,40.078811,-76.730422";
+
+        var response = this.mockMvc
+                .perform(get("/api/listedBuildings/search/findAllInPolygon?polygon=" + validPolygon))
+                // type
+                .andExpect(jsonPath("$.features[0].type").value("Feature"))
+                // geometry
+                .andExpect(jsonPath("$.features[0].geometry.type").value("Point"))
+                .andExpect(jsonPath("$.features[0].geometry.coordinates[0]").value(0.25))
+                .andExpect(jsonPath("$.features[0].geometry.coordinates[1]").value(0.75))
+                // properties
+                .andExpect(jsonPath("$.features[0].properties.hyperlink").value("https://historicengland.org.uk/42"))
+                .andExpect(jsonPath("$.features[0].properties.locationName").value("Testershire"))
+                .andExpect(jsonPath("$.features[0].properties.grade").value("I"))
+                .andExpect(jsonPath("$.features[0].properties.name").value("Grade 1 Guardhouse"))
+                .andExpect(jsonPath("$.features[0].properties.id").value(listedBuilding.getId()))
+                .andExpect(jsonPath("$.features[0].properties.listEntry").value("42"));
     }
 
     @Test

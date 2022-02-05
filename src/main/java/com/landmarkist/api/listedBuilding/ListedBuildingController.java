@@ -59,15 +59,27 @@ public class ListedBuildingController {
     }
 
     private FeatureCollection createFeatureCollection(List<ListedBuilding> listedBuildings) {
-        GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
-
-        Feature[] features = listedBuildings.stream().map(listedBuilding -> {
-            Map<String, Object> properties = new HashMap<>();
-            Geometry geo = listedBuilding.getLocation();
-
-            return new Feature(geoJSONWriter.write(geo), properties);
-        }).toArray(Feature[]::new);
+        Feature[] features = listedBuildings
+                .stream()
+                .map(this::listedBuildingToFeature)
+                .toArray(Feature[]::new);
 
         return new FeatureCollection(features);
+    }
+
+    private Feature listedBuildingToFeature(ListedBuilding listedBuilding) {
+        GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("id", listedBuilding.getId());
+        properties.put("name", listedBuilding.getName());
+        properties.put("grade", listedBuilding.getGrade());
+        properties.put("locationName", listedBuilding.getLocationName());
+        properties.put("listEntry", listedBuilding.getListEntry());
+        properties.put("hyperlink", listedBuilding.getHyperlink());
+
+        Geometry geo = listedBuilding.getLocation();
+
+        return new Feature(geoJSONWriter.write(geo), properties);
     }
 }
