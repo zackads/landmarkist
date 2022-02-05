@@ -1,4 +1,4 @@
-package com.landmarkist.www.listedBuilding;
+package com.landmarkist.api.listedBuilding;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,11 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ListedBuildingRepository
-        extends JpaRepository<ListedBuilding, UUID> {
-    @Query(
-            value = "SELECT * FROM listed_building WHERE st_covers(geography(:polygon), listed_building.location);",
-            nativeQuery = true
-    )
+public interface ListedBuildingRepository extends JpaRepository<ListedBuilding, UUID> {
+    @Query(value = "SELECT * FROM listed_building WHERE st_covers(geography(:polygon), listed_building.location);", nativeQuery = true)
     List<ListedBuilding> findAllInPolygon(@Param("polygon") Polygon polygon);
 }

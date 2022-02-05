@@ -1,4 +1,4 @@
-package com.landmarkist.www.listedBuilding;
+package com.landmarkist.api.listedBuilding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,54 +39,34 @@ public class ListedBuildingController {
 
         List<Coordinate> coordinates = new ArrayList<>();
         for (int i = 0; i < array.length; i += 2) {
-            coordinates.add(
-                    new Coordinate(
-                            Double.parseDouble(array[i]),
-                            Double.parseDouble(array[i + 1])
-                    )
-            );
+            coordinates.add(new Coordinate(Double.parseDouble(array[i]), Double.parseDouble(array[i + 1])));
         }
 
-        return new GeometryFactory()
-                .createPolygon(coordinates.toArray(new Coordinate[] {}));
+        return new GeometryFactory().createPolygon(coordinates.toArray(new Coordinate[] {}));
     }
 
     @GetMapping(value = "listedBuildings/search/findAllInPolygon")
     @ResponseBody
-    public ResponseEntity<FeatureCollection> findListedBuildingsInPolygon2(
-            @RequestParam("polygon") String polygon
-    ) {
+    public ResponseEntity<FeatureCollection> findListedBuildingsInPolygon2(@RequestParam("polygon") String polygon) {
         try {
-            List<ListedBuilding> listedBuildings = repository.findAllInPolygon(
-                    createPolygonFromQueryString(polygon)
-            );
+            List<ListedBuilding> listedBuildings = repository.findAllInPolygon(createPolygonFromQueryString(polygon));
 
-            return new ResponseEntity<>(
-                    createFeatureCollection(listedBuildings),
-                    HttpStatus.OK
-            );
+            return new ResponseEntity<>(createFeatureCollection(listedBuildings), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "There was a problem with the polygon.  Try again."
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "There was a problem with the polygon.  Try again.");
         }
     }
 
-    private FeatureCollection createFeatureCollection(
-            List<ListedBuilding> listedBuildings
-    ) {
+    private FeatureCollection createFeatureCollection(List<ListedBuilding> listedBuildings) {
         GeoJSONWriter geoJSONWriter = new GeoJSONWriter();
 
-        Feature[] features = listedBuildings
-                .stream()
-                .map(listedBuilding -> {
-                    Map<String, Object> properties = new HashMap<>();
-                    Geometry geo = listedBuilding.getLocation();
+        Feature[] features = listedBuildings.stream().map(listedBuilding -> {
+            Map<String, Object> properties = new HashMap<>();
+            Geometry geo = listedBuilding.getLocation();
 
-                    return new Feature(geoJSONWriter.write(geo), properties);
-                })
-                .toArray(Feature[]::new);
+            return new Feature(geoJSONWriter.write(geo), properties);
+        }).toArray(Feature[]::new);
 
         return new FeatureCollection(features);
     }

@@ -25,76 +25,53 @@ import org.opengis.referencing.operation.TransformException;
 
 public class R__Load_listed_buildings_in_England extends BaseJavaMigration {
 
-  public void migrate(Context context)
-    throws SQLException, IOException, FactoryException, TransformException {
-    try (
-      PreparedStatement statement = context
-        .getConnection()
-        .prepareStatement(
-          "INSERT INTO listed_building " +
-          "(name, grade, location_name, location, list_entry, hyperlink) VALUES " +
-          "(?, ?, ?, ST_Point(?, ?), ?, ?)"
-        )
-    ) {
-      try (
-        FeatureIterator<SimpleFeature> features = getFeaturesFromShapefile(
-          "src/main/java/db/data/ListedBuildings_16Dec2021.shp"
-        )
-      ) {
-        while (features.hasNext()) {
-          SimpleFeature feature = features.next();
+    public void migrate(Context context) throws SQLException, IOException, FactoryException, TransformException {
+        try (PreparedStatement statement = context.getConnection()
+                .prepareStatement("INSERT INTO listed_building "
+                        + "(name, grade, location_name, location, list_entry, hyperlink) VALUES "
+                        + "(?, ?, ?, ST_Point(?, ?), ?, ?)")) {
+            try (FeatureIterator<SimpleFeature> features = getFeaturesFromShapefile(
+                    "src/main/java/db/data/ListedBuildings_16Dec2021.shp")) {
+                while (features.hasNext()) {
+                    SimpleFeature feature = features.next();
 
-          double easting = Double.parseDouble(
-            feature.getAttribute("Easting").toString()
-          );
-          double northing = Double.parseDouble(
-            feature.getAttribute("Northing").toString()
-          );
+                    double easting = Double.parseDouble(feature.getAttribute("Easting").toString());
+                    double northing = Double.parseDouble(feature.getAttribute("Northing").toString());
 
-          Coordinate location = convertBNGtoWGS84(
-            new Coordinate(easting, northing)
-          );
+                    Coordinate location = convertBNGtoWGS84(new Coordinate(easting, northing));
 
-          statement.setString(1, feature.getAttribute("Name").toString());
-          statement.setString(2, feature.getAttribute("Grade").toString());
-          statement.setString(3, feature.getAttribute("Location").toString());
-          statement.setDouble(4, location.x);
-          statement.setDouble(5, location.y);
-          statement.setString(6, feature.getAttribute("ListEntry").toString());
-          statement.setString(7, feature.getAttribute("Hyperlink").toString());
-          statement.addBatch();
+                    statement.setString(1, feature.getAttribute("Name").toString());
+                    statement.setString(2, feature.getAttribute("Grade").toString());
+                    statement.setString(3, feature.getAttribute("Location").toString());
+                    statement.setDouble(4, location.x);
+                    statement.setDouble(5, location.y);
+                    statement.setString(6, feature.getAttribute("ListEntry").toString());
+                    statement.setString(7, feature.getAttribute("Hyperlink").toString());
+                    statement.addBatch();
+                }
+                statement.executeBatch();
+            }
         }
-        statement.executeBatch();
-      }
     }
-  }
 
-  private FeatureIterator<SimpleFeature> getFeaturesFromShapefile(
-    String pathname
-  ) throws IOException {
-    DataStore dataStore = DataStoreFinder.getDataStore(
-      Map.of("url", new File(pathname).toURI().toURL())
-    );
-    FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(
-      dataStore.getTypeNames()[0]
-    );
-    dataStore.dispose();
+    private FeatureIterator<SimpleFeature> getFeaturesFromShapefile(String pathname) throws IOException {
+        DataStore dataStore = DataStoreFinder.getDataStore(Map.of("url", new File(pathname).toURI().toURL()));
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore
+                .getFeatureSource(dataStore.getTypeNames()[0]);
+        dataStore.dispose();
 
-    return source.getFeatures(Filter.INCLUDE).features();
-  }
+        return source.getFeatures(Filter.INCLUDE).features();
+    }
 
-  /**
-   * The raw listed buildings dataset contains locations using British National Grid coordinates.  For consistency
-   * and simplicity, Landmarkist uses the WGS84 coordinate reference system, as also used by Google Maps, GPS etc.
-   */
-  private Coordinate convertBNGtoWGS84(Coordinate bngPoint)
-    throws FactoryException, TransformException {
-    CoordinateReferenceSystem britishNationalGrid = CRS.decode("EPSG:27700");
+    /**
+     * The raw listed buildings dataset contains locations using British National
+     * Grid coordinates. For consistency and simplicity, Landmarkist uses the WGS84
+     * coordinate reference system, as also used by Google Maps, GPS etc.
+     */
+    private Coordinate convertBNGtoWGS84(Coordinate bngPoint) throws FactoryException, TransformException {
+        CoordinateReferenceSystem britishNationalGrid = CRS.decode("EPSG:27700");
 
-    MathTransform transform = CRS.findMathTransform(
-      britishNationalGrid,
-      DefaultGeographicCRS.WGS84
-    );
-    return JTS.transform(bngPoint, null, transform);
-  }
+        MathTransform transform = CRS.findMathTransform(britishNationalGrid, DefaultGeographicCRS.WGS84);
+        return JTS.transform(bngPoint, null, transform);
+    }
 }

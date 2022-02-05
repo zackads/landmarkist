@@ -1,4 +1,4 @@
-package com.landmarkist.www.listedBuilding;
+package com.landmarkist.api.listedBuilding;
 
 import java.net.URL;
 import java.util.UUID;

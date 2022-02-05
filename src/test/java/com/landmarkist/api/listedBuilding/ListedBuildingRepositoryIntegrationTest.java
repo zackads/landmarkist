@@ -1,4 +1,4 @@
-package com.landmarkist.www.listedBuilding;
+package com.landmarkist.api.listedBuilding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,65 +23,40 @@ import org.testcontainers.utility.DockerImageName;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ListedBuildingRepositoryIntegrationTest {
 
-    private static final DockerImageName postgisImage = DockerImageName
-            .parse("postgis/postgis:13-3.1-alpine")
+    private static final DockerImageName postgisImage = DockerImageName.parse("postgis/postgis:13-3.1-alpine")
             .asCompatibleSubstituteFor("postgres");
     @Container
-    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(
-            postgisImage
-    )
-            .withDatabaseName("landmarkist")
-            .withUsername("user")
-            .withPassword("password");
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(postgisImage)
+            .withDatabaseName("landmarkist").withUsername("user").withPassword("password");
     @Autowired
     private ListedBuildingRepository listedBuildingRepository;
 
     @Test
     void givenAPolygon__whenListedBuildingsAreInThePolygon__thenReturnFoundListedBuildings()
             throws MalformedURLException {
-        Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(0, 0),
-                new Coordinate(0, 1),
-                new Coordinate(1, 1),
-                new Coordinate(1, 0),
-                new Coordinate(0, 0),
-        };
+        Coordinate[] coordinates = new Coordinate[] {new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(1, 1),
+                new Coordinate(1, 0), new Coordinate(0, 0),};
 
         Polygon polygon = new GeometryFactory().createPolygon(coordinates);
 
-        ListedBuilding listedBuilding = ListedBuilding
-                .builder()
-                .name("Testington Towers")
-                .grade("I")
-                .location(new GeometryFactory().createPoint(new Coordinate(0.5, 0.5)))
-                .locationName("Centroidville")
-                .listEntry("1")
-                .hyperlink(new URL("https://en.wikipedia.org/wiki/Centroid"))
-                .build();
+        ListedBuilding listedBuilding = ListedBuilding.builder().name("Testington Towers").grade("I")
+                .location(new GeometryFactory().createPoint(new Coordinate(0.5, 0.5))).locationName("Centroidville")
+                .listEntry("1").hyperlink(new URL("https://en.wikipedia.org/wiki/Centroid")).build();
         listedBuildingRepository.save(listedBuilding);
 
-        List<ListedBuilding> listedBuildings = listedBuildingRepository.findAllInPolygon(
-                polygon
-        );
+        List<ListedBuilding> listedBuildings = listedBuildingRepository.findAllInPolygon(polygon);
 
         assertEquals(1, listedBuildings.size());
     }
 
     @Test
     void givenAPolygon__whenListedBuildingsAreNotInThePolygon__thenReturnEmptyList() {
-        Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(0, 0),
-                new Coordinate(0, 1),
-                new Coordinate(1, 1),
-                new Coordinate(1, 0),
-                new Coordinate(0, 0),
-        };
+        Coordinate[] coordinates = new Coordinate[] {new Coordinate(0, 0), new Coordinate(0, 1), new Coordinate(1, 1),
+                new Coordinate(1, 0), new Coordinate(0, 0),};
 
         Polygon polygon = new GeometryFactory().createPolygon(coordinates);
 
-        List<ListedBuilding> listedBuildings = listedBuildingRepository.findAllInPolygon(
-                polygon
-        );
+        List<ListedBuilding> listedBuildings = listedBuildingRepository.findAllInPolygon(polygon);
 
         assertTrue(listedBuildings.isEmpty());
     }
