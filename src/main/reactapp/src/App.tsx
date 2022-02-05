@@ -3,11 +3,16 @@ import './App.css';
 import Map, {Layer, MapProvider, MapRef, Source} from "react-map-gl";
 import {MapboxMap} from "react-map-gl/src/types/index";
 import {FeatureCollection} from "geojson";
+import {debounce} from "lodash";
 
 function App() {
     const [landmarks, setLandmarks] = useState<FeatureCollection | string>(emptyGeoJson);
 
     const mapRef = React.useRef<MapRef>(null);
+
+    const handleMove = debounce(() => {
+        setLandmarks(`/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(mapRef.current!.getMap())}`);
+    }, 1000);
 
     return (
         <MapProvider>
@@ -18,12 +23,8 @@ function App() {
                 initialViewState={{longitude: -2.59, latitude: 51.45}}
                 style={{height: "100vh", width: "100vw"}}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
-                onMove={() =>
-                    setLandmarks(`/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(mapRef.current!.getMap())}`)
-                }
-                onLoad={() =>
-                    setLandmarks(`/api/listedBuildings/search/findAllInPolygon?polygon=${viewport(mapRef.current!.getMap())}`)
-                }
+                onLoad={handleMove}
+                onMove={handleMove}
             >
                 <Source id="listed-buildings" type="geojson"
                         data={landmarks}>
