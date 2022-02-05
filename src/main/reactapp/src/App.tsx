@@ -20,7 +20,8 @@ function App() {
                 ref={mapRef}
                 id="map"
                 mapboxAccessToken={"pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw"}
-                initialViewState={{longitude: -2.59, latitude: 51.45, zoom: 14}}
+                initialViewState={{longitude: -2.59, latitude: 51.45, zoom: 10}}
+                minZoom={10}
                 style={{height: "100vh", width: "100vw"}}
                 mapStyle="mapbox://styles/mapbox/light-v10"
                 onLoad={handleMove}
