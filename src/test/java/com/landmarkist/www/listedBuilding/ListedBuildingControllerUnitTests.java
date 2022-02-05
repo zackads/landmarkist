@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URL;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -34,7 +35,15 @@ public class ListedBuildingControllerUnitTests {
         Mockito
                 .when(mockRepository.findAllInPolygon(any(Polygon.class)))
                 .thenReturn(
-                        List.of(ListedBuilding.builder().name("Testington Towers").build())
+                        List.of(ListedBuilding
+                                .builder()
+                                .name("Grade 1 Guardhouse")
+                                .grade("I")
+                                .location(new GeometryFactory().createPoint(new Coordinate(0.25, 0.75)))
+                                .locationName("Testershire")
+                                .listEntry("1")
+                                .hyperlink(new URL("https://historicengland.org.uk/1"))
+                                .build())
                 );
 
         String validPolygon =
