@@ -64,14 +64,12 @@ dependencies {
     implementation 'org.geotools:gt-epsg-hsql:26.1'
     implementation 'org.wololo:jts2geojson:0.16.1'
 
-
     // Dev + test
     developmentOnly 'org.springframework.boot:spring-boot-devtools:2.6.1'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.1'
     testImplementation "org.testcontainers:postgresql:1.16.2"
     testImplementation 'org.testcontainers:testcontainers:1.16.2'
     testImplementation 'org.testcontainers:junit-jupiter:1.16.2'
-    testImplementation 'io.github.wimdeblauwe:testcontainers-cypress:1.6.1'
 }
 
 dependencyManagement {
@@ -82,11 +80,4 @@ dependencyManagement {
 
 test {
     useJUnitPlatform()
-}
-
-processTestResources {
-    from("src/test/e2e") {
-        exclude 'node_modules'
-        into("e2e")
-    }
 }
