@@ -1,15 +1,6 @@
 import React, {useCallback, useState} from 'react';
 import './App.css';
-import Map, {
-    FullscreenControl,
-    GeolocateControl,
-    Layer,
-    MapProvider,
-    MapRef,
-    NavigationControl,
-    Popup,
-    Source
-} from "react-map-gl";
+import Map, {GeolocateControl, Layer, MapProvider, MapRef, NavigationControl, Popup, Source} from "react-map-gl";
 import {MapboxMap} from "react-map-gl/src/types/index";
 import {Feature, FeatureCollection, Point} from "geojson";
 import GeocoderControl from "./components/GeocoderControl";
@@ -58,12 +49,13 @@ function App() {
                 onMouseLeave={() => mapRef.current!.getCanvas().style.cursor = ''}
                 interactiveLayerIds={["grade-i", "grade-ii*", "grade-ii"]}
             >
-                <NavigationControl showZoom={false} visualizePitch={true}/>
-                <GeolocateControl/>
-                <FullscreenControl/>
+                <NavigationControl showZoom={false} visualizePitch={true} position="bottom-right"/>
+                <GeolocateControl position="bottom-right"/>
                 <GeocoderControl
-                    mapboxAccessToken={"pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw"}
-                    position={"top-right"}/>
+                    mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
+                    position="top-left"
+                    marker={false}
+                />
                 <Source id="listed-buildings" type="geojson"
                         data={landmarks}>
                     <Layer id="grade-i" type="circle" filter={['==', "grade", "I"]}

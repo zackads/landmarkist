@@ -47,17 +47,15 @@ type GeocoderControlProps = {
     onError?: (e: object) => void;
 };
 
-// @ts-ignore
 export default function GeocoderControl(props: GeocoderControlProps) {
     const [marker, setMarker] = useState<JSX.Element | null>(null);
 
     const geocoder: any = useControl(
         () => {
-            // @ts-ignore
             const ctrl = new MapboxGeocoder({
                 ...props,
-                accessToken: props.mapboxAccessToken
-            });
+                accessToken: props.mapboxAccessToken,
+            } as MapboxGeocoder.GeocoderOptions);
             ctrl.on('loading', props.onLoading!);
             ctrl.on('results', props.onResults!);
             ctrl.on('result', evt => {
