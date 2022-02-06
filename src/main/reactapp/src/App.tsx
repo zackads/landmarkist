@@ -1,8 +1,20 @@
 import React, {useCallback, useState} from 'react';
 import './App.css';
-import Map, {Layer, MapProvider, MapRef, Popup, Source} from "react-map-gl";
+import Map, {
+    FullscreenControl,
+    GeolocateControl,
+    Layer,
+    MapProvider,
+    MapRef,
+    NavigationControl,
+    Popup,
+    Source
+} from "react-map-gl";
 import {MapboxMap} from "react-map-gl/src/types/index";
 import {Feature, FeatureCollection, Point} from "geojson";
+import GeocoderControl from "./components/GeocoderControl";
+
+const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw"
 
 function App() {
     const [viewState, setViewState] = useState({
@@ -35,7 +47,7 @@ function App() {
                 {...viewState}
                 ref={mapRef}
                 id="map"
-                mapboxAccessToken={"pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw"}
+                mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
                 minZoom={10}
                 style={{height: "100vh", width: "100vw"}}
                 mapStyle="mapbox://styles/mapbox/light-v10"
@@ -46,6 +58,12 @@ function App() {
                 onMouseLeave={() => mapRef.current!.getCanvas().style.cursor = ''}
                 interactiveLayerIds={["grade-i", "grade-ii*", "grade-ii"]}
             >
+                <NavigationControl showZoom={false} visualizePitch={true}/>
+                <GeolocateControl/>
+                <FullscreenControl/>
+                <GeocoderControl
+                    mapboxAccessToken={"pk.eyJ1IjoiemFja2FkcyIsImEiOiJjazZ3bnYyajAwOWp5M2htYW9qemQ2dXRyIn0.GbE76MBYsJpDdStQgE_YHw"}
+                    position={"top-right"}/>
                 <Source id="listed-buildings" type="geojson"
                         data={landmarks}>
                     <Layer id="grade-i" type="circle" filter={['==', "grade", "I"]}
@@ -59,7 +77,8 @@ function App() {
                 <LandmarkPopup landmark={selectedLandmark} onClose={() => setSelectedLandmark(undefined)}/>}
             </Map>
         </MapProvider>
-    );
+    )
+        ;
 }
 
 const LandmarkPopup = ({landmark, onClose}: { landmark: Landmark, onClose: () => any }): JSX.Element => {
