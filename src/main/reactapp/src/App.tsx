@@ -8,7 +8,7 @@ function App() {
     const [viewState, setViewState] = useState({
         longitude: -2.59,
         latitude: 51.45,
-        zoom: 10,
+        zoom: 14,
     })
     const [landmarks, setLandmarks] = useState<FeatureCollection | string>(emptyGeoJson);
     const [selectedLandmark, setSelectedLandmark] = useState<Landmark>();
